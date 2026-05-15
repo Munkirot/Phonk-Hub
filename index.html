@@ -58,7 +58,11 @@ align-items:center;
 background:rgba(0,0,0,0.5);
 }
 
-.title{color:#00ff88;font-weight:bold;font-size:22px;}
+.title{
+color:#00ff88;
+font-weight:bold;
+font-size:22px;
+}
 
 .search{
 padding:10px;
@@ -73,7 +77,7 @@ width:200px;
 flex:1;
 overflow:auto;
 padding:10px;
-padding-bottom:180px;
+padding-bottom:200px;
 }
 
 .song{
@@ -93,7 +97,9 @@ align-items:center;
 }
 
 .song img{
-width:50px;height:50px;border-radius:10px;
+width:50px;
+height:50px;
+border-radius:10px;
 }
 
 .like{color:#ff4d6d;font-weight:bold;}
@@ -132,6 +138,7 @@ padding:10px;
 <div class="header">
 <div class="title">PHONK HUB</div>
 <input class="search" id="search" oninput="render()" placeholder="search">
+<button onclick="openAdd()">+ Add</button>
 </div>
 
 <div class="list" id="list"></div>
@@ -171,7 +178,7 @@ const songsRef = collection(db,"songs");
 
 window.songs = [];
 
-/* LIVE DATA */
+/* LIVE SYNC */
 onSnapshot(songsRef,(snap)=>{
 window.songs = snap.docs.map(d=>({id:d.id,...d.data()}));
 render();
@@ -234,6 +241,7 @@ m.className="screen";
 
 m.innerHTML=`
 <div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
+
 <h3>${s.title}</h3>
 
 <div>
@@ -241,8 +249,10 @@ ${(s.comments||[]).map(c=>`<div>${c}</div>`).join("")}
 </div>
 
 <input id="cInput" placeholder="comment">
+
 <button onclick="addC('${id}')">Add</button>
 <button onclick="this.parentElement.parentElement.remove()">Close</button>
+
 </div>
 `;
 
@@ -265,6 +275,54 @@ const pass = prompt("Password?");
 if(pass !== "aletorma") return;
 
 await deleteDoc(doc(db,"songs",id));
+};
+
+/* ADD SONG UI */
+window.openAdd = ()=>{
+
+const m = document.createElement("div");
+m.className="screen";
+
+m.innerHTML=`
+<div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
+
+<h2>Add Song</h2>
+
+<input id="t" placeholder="Title">
+<input id="a" placeholder="Artist">
+<input id="l" placeholder="Link">
+<input id="p" type="password" placeholder="Password">
+
+<button onclick="submitSong()">Add</button>
+<button onclick="this.parentElement.parentElement.remove()">Close</button>
+
+</div>
+`;
+
+document.body.appendChild(m);
+};
+
+/* ADD SONG FIREBASE */
+window.submitSong = async ()=>{
+
+const pass = document.getElementById("p").value;
+if(pass !== "kingphonk") return;
+
+const title = document.getElementById("t").value;
+const artist = document.getElementById("a").value;
+const link = document.getElementById("l").value;
+
+if(!title || !artist || !link) return;
+
+await addDoc(songsRef,{
+title,
+artist,
+link,
+likes:0,
+comments:[]
+});
+
+document.querySelectorAll(".screen").forEach(e=>e.remove());
 };
 
 /* INTRO */
