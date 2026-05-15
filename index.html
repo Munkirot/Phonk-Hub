@@ -1,101 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Phonk Hub</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHONK HUB</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0f0f0f;
-      color: white;
-    }
+<style>
+/* ===== SUN VANHA CSS (ENNALLAAN) ===== */
 
-    header {
-      padding: 20px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-    #list {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+body{
+font-family:Arial,sans-serif;
+background:#050816;
+color:white;
+overflow:hidden;
+}
 
-    .song {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background: #1c1c1c;
-      border-radius: 10px;
-    }
+.screen{
+position:absolute;
+inset:0;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+transition:0.6s;
+background:radial-gradient(circle at top,#1a0040,#000);
+}
 
-    .play {
-      cursor: pointer;
-      background: #00ff88;
-      padding: 5px 10px;
-      border-radius: 6px;
-      color: black;
-    }
+.hidden{
+opacity:0;
+pointer-events:none;
+transform:scale(1.05);
+}
 
-    #addBox {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background: #111;
-    }
+.logo{
+width:190px;
+height:190px;
+border-radius:50%;
+border:5px solid #00ff88;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:48px;
+font-weight:bold;
+color:#00ff88;
+box-shadow:0 0 20px #00ff88,0 0 50px #00ff88;
+animation:intro 1.8s ease;
+}
 
-    input {
-      flex: 1;
-      padding: 10px;
-    }
+@keyframes intro{
+0%{transform:scale(0) rotate(0deg);opacity:0;}
+100%{transform:scale(1) rotate(360deg);opacity:1;}
+}
 
-    button {
-      padding: 10px;
-      cursor: pointer;
-    }
-  </style>
+#loadingText{
+font-size:24px;
+letter-spacing:3px;
+}
+
+.app{
+display:flex;
+flex-direction:column;
+height:100vh;
+background:radial-gradient(circle at top,#1a0033,#000);
+}
+
+.header{
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(0,0,0,0.5);
+backdrop-filter:blur(10px);
+border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.title{
+font-size:22px;
+font-weight:bold;
+color:#00ff88;
+letter-spacing:2px;
+}
+
+.search{
+padding:10px;
+border:none;
+border-radius:10px;
+outline:none;
+width:220px;
+background:#111;
+color:white;
+}
+
+.playlists{
+display:flex;
+gap:10px;
+padding:10px;
+overflow:auto;
+border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.playlistBtn{
+padding:10px 15px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#111;
+color:white;
+transition:0.2s;
+white-space:nowrap;
+}
+
+.playlistBtn:hover{
+background:#00ff88;
+color:black;
+}
+
+.list{
+flex:1;
+overflow:auto;
+padding:10px;
+padding-bottom:220px;
+}
+
+.song{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(255,255,255,0.05);
+padding:12px;
+margin-bottom:10px;
+border-radius:12px;
+transition:0.2s;
+}
+
+.song:hover{
+background:rgba(0,255,136,0.1);
+transform:scale(1.01);
+}
+
+.songLeft{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.song img{
+width:55px;
+height:55px;
+border-radius:10px;
+}
+
+.songTitle{
+font-weight:bold;
+}
+
+.songArtist{
+font-size:12px;
+opacity:0.7;
+}
+
+.songButtons{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+justify-content:flex-end;
+}
+
+.songButtons button,
+.actionBtn{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#111;
+color:white;
+transition:0.2s;
+}
+
+.songButtons button:hover,
+.actionBtn:hover{
+background:#00ff88;
+color:black;
+}
+
+.player{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#0b0b0b;
+padding:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-top:1px solid rgba(255,255,255,0.08);
+}
+
+.nowPlaying{
+font-size:14px;
+}
+
+.bottomPanel{
+position:fixed;
+bottom:60px;
+left:0;
+right:0;
+padding:10px;
+display:flex;
+gap:10px;
+justify-content:center;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(10px);
+}
+
+.commentModal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.8);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.commentBox{
+width:90%;
+max-width:500px;
+background:#111;
+padding:20px;
+border-radius:15px;
+}
+
+.commentInput,
+.passwordInput,
+.songInput{
+width:100%;
+padding:10px;
+border:none;
+border-radius:10px;
+margin-bottom:10px;
+background:#1c1c1c;
+color:white;
+}
+
+.comment{
+background:#1c1c1c;
+padding:10px;
+border-radius:10px;
+margin-bottom:8px;
+}
+
+.like{
+color:#ff4d6d;
+font-weight:bold;
+}
+</style>
 </head>
 
 <body>
 
-<header>🔥 PHONK HUB</header>
-
-<div id="list"></div>
-
-<div id="addBox">
-  <input id="title" placeholder="Song title">
-  <input id="link" placeholder="YouTube link">
-  <button onclick="addSong()">ADD</button>
+<!-- INTRO -->
+<div class="screen" id="intro">
+<div class="logo">PHB</div>
 </div>
 
-<audio id="audio"></audio>
+<div class="screen hidden" id="loading">
+<div id="loadingText">LOADING...</div>
+</div>
+
+<!-- APP -->
+<div class="app hidden" id="app">
+
+<div class="header">
+<div class="title">PHONK HUB</div>
+
+<input class="search" id="search" placeholder="Search..." oninput="renderSongs()">
+</div>
+
+<div class="playlists">
+<button class="playlistBtn" onclick="openPlaylist('https://www.youtube.com/results?search_query=drift+phonk+playlist')">Drift</button>
+<button class="playlistBtn" onclick="openPlaylist('https://www.youtube.com/results?search_query=aggressive+phonk+playlist')">Aggressive</button>
+<button class="playlistBtn" onclick="openPlaylist('https://www.youtube.com/results?search_query=night+drive+phonk+playlist')">Night Drive</button>
+</div>
+
+<div class="list" id="list"></div>
+
+<div class="bottomPanel">
+<button class="actionBtn" onclick="openAddSong()">Add Song</button>
+</div>
+
+<div class="player">
+<div class="nowPlaying" id="nowPlaying">No song selected</div>
+</div>
+
+</div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot
+getFirestore,
+collection,
+addDoc,
+onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "phonk-hub.firebaseapp.com",
-  projectId: "phonk-hub",
-  storageBucket: "phonk-hub.firebasestorage.app",
-  messagingSenderId: "832888450027",
-  appId: "YOUR_APP_ID"
+apiKey: "YOUR_API_KEY",
+authDomain: "phonk-hub.firebaseapp.com",
+projectId: "phonk-hub",
+storageBucket: "phonk-hub.firebasestorage.app",
+messagingSenderId: "832888450027",
+appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -104,57 +326,124 @@ const songsRef = collection(db, "songs");
 
 window.songs = [];
 
-// 🔥 LIVE SYNC (tämä korjaa sun puhelin/kone ongelman)
+/* 🔥 LIVE FIREBASE SYNC */
 onSnapshot(songsRef, (snapshot) => {
-  window.songs = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+window.songs = snapshot.docs.map(doc => ({
+id: doc.id,
+...doc.data()
+}));
 
-  render(window.songs);
+renderSongs();
 });
 
-// ➕ ADD SONG FIRESTOREEN
-window.addSong = async () => {
-  const title = document.getElementById("title").value;
-  const link = document.getElementById("link").value;
-
-  if (!title || !link) return;
-
-  await addDoc(songsRef, {
-    title,
-    link,
-    likes: 0,
-    img: "https://picsum.photos/200"
-  });
-
-  document.getElementById("title").value = "";
-  document.getElementById("link").value = "";
+/* PLAYLIST */
+window.openPlaylist = (url) => {
+window.open(url, "_blank");
 };
 
-// 🎵 PLAY
-window.play = (i) => {
-  const s = window.songs[i];
-  const audio = document.getElementById("audio");
-
-  audio.src = s.link;
-  audio.play();
+/* PLAY */
+window.playSong = (link, title) => {
+document.getElementById("nowPlaying").innerText = "Now Playing: " + title;
+window.open(link, "_blank");
 };
 
-// 📜 RENDER
-function render(list) {
-  const c = document.getElementById("list");
-  c.innerHTML = "";
+/* RENDER */
+window.renderSongs = () => {
 
-  list.forEach((s, i) => {
-    c.innerHTML += `
-      <div class="song">
-        <div>${s.title}</div>
-        <div class="play" onclick="play(${i})">PLAY</div>
-      </div>
-    `;
-  });
-}
+const q = document.getElementById("search").value.toLowerCase();
+const list = document.getElementById("list");
+
+list.innerHTML = "";
+
+window.songs
+.filter(s => (s.title || "").toLowerCase().includes(q))
+.forEach((s, i) => {
+
+list.innerHTML += `
+<div class="song">
+
+<div class="songLeft">
+<img src="https://picsum.photos/100?random=${i}">
+<div>
+<div class="songTitle">${s.title}</div>
+<div class="songArtist">${s.artist || ""}</div>
+<div class="like">❤️ ${s.likes || 0}</div>
+</div>
+</div>
+
+<div class="songButtons">
+<button onclick="playSong('${s.link}','${s.title}')">Play</button>
+</div>
+
+</div>
+`;
+
+});
+
+};
+
+/* ADD SONG FIRESTORE */
+window.openAddSong = () => {
+
+const modal = document.createElement("div");
+modal.className = "commentModal";
+
+modal.innerHTML = `
+<div class="commentBox">
+<h2>Add Song</h2>
+
+<input id="songTitle" class="songInput" placeholder="Title">
+<input id="songArtist" class="songInput" placeholder="Artist">
+<input id="songLink" class="songInput" placeholder="Link">
+
+<input id="addPassword" class="passwordInput" type="password" placeholder="Password">
+
+<button class="actionBtn" onclick="submitAddSong()">Add</button>
+<button class="actionBtn" onclick="closeModal()">Close</button>
+</div>
+`;
+
+document.body.appendChild(modal);
+};
+
+window.submitAddSong = async () => {
+
+const pass = document.getElementById("addPassword").value;
+if(pass !== "kingphonk") return;
+
+const title = document.getElementById("songTitle").value;
+const artist = document.getElementById("songArtist").value;
+const link = document.getElementById("songLink").value;
+
+if(!title || !artist || !link) return;
+
+await addDoc(songsRef, {
+title,
+artist,
+link,
+likes: 0
+});
+
+closeModal();
+};
+
+window.closeModal = () => {
+document.querySelectorAll(".commentModal").forEach(e => e.remove());
+};
+
+</script>
+
+<script>
+setTimeout(()=>{
+document.getElementById("intro").classList.add("hidden");
+document.getElementById("loading").classList.remove("hidden");
+
+setTimeout(()=>{
+document.getElementById("loading").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+},2000);
+
+},1800);
 </script>
 
 </body>
