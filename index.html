@@ -39,7 +39,7 @@ animation:pop 1.6s ease;
 
 @keyframes pop{
 0%{transform:scale(0) rotate(0);}
-100%{transform:scale(1) rotate(360deg);}
+100%{transform:scale(1) rotate(360);}
 }
 
 /* APP */
@@ -102,7 +102,19 @@ height:50px;
 border-radius:10px;
 }
 
-.like{color:#ff4d6d;font-weight:bold;}
+.songTitle{
+font-weight:bold;
+}
+
+.songArtist{
+font-size:12px;
+opacity:0.7;
+}
+
+.like{
+color:#ff4d6d;
+font-weight:bold;
+}
 
 button{
 padding:6px 10px;
@@ -201,14 +213,14 @@ list.innerHTML += `
 <div class="songLeft">
 <img src="https://picsum.photos/100?random=${s.id}">
 <div>
-<div>${s.title}</div>
-<div>${s.artist}</div>
+<div class="songTitle">${s.title}</div>
+<div class="songArtist">${s.artist}</div>
 <div class="like">❤️ ${s.likes||0}</div>
 </div>
 </div>
 
 <div>
-<button onclick="play('${s.title}')">Play</button>
+<button onclick="play('${s.title}','${s.link}')">Play</button>
 <button onclick="like('${s.id}')">Like</button>
 <button onclick="openComments('${s.id}')">Comments</button>
 <button onclick="del('${s.id}')">Delete</button>
@@ -219,9 +231,13 @@ list.innerHTML += `
 });
 };
 
-/* PLAY */
-window.play = (t)=>{
-document.getElementById("nowPlaying").innerText="Now Playing: "+t;
+/* PLAY FIX */
+window.play = (title, link) => {
+document.getElementById("nowPlaying").innerText = "Now Playing: " + title;
+
+if(link){
+window.open(link,"_blank");
+}
 };
 
 /* LIKE */
@@ -277,7 +293,7 @@ if(pass !== "aletorma") return;
 await deleteDoc(doc(db,"songs",id));
 };
 
-/* ADD SONG UI */
+/* ADD SONG */
 window.openAdd = ()=>{
 
 const m = document.createElement("div");
@@ -302,7 +318,7 @@ m.innerHTML=`
 document.body.appendChild(m);
 };
 
-/* ADD SONG FIREBASE */
+/* SUBMIT SONG */
 window.submitSong = async ()=>{
 
 const pass = document.getElementById("p").value;
