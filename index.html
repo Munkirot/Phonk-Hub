@@ -6,43 +6,67 @@
 <title>PHONK HUB</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
 body{
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:#050816;
 color:white;
 overflow:hidden;
 }
 
 /* INTRO */
+
 .screen{
-position:absolute;inset:0;
+position:absolute;
+inset:0;
 display:flex;
 justify-content:center;
 align-items:center;
 background:radial-gradient(circle,#1a0040,#000);
 transition:0.6s;
+z-index:999;
 }
 
-.hidden{opacity:0;pointer-events:none;transform:scale(1.1);}
+.hidden{
+opacity:0;
+pointer-events:none;
+transform:scale(1.1);
+}
 
 .logo{
-width:180px;height:180px;border-radius:50%;
+width:180px;
+height:180px;
+border-radius:50%;
 border:5px solid #00ff88;
-display:flex;justify-content:center;align-items:center;
-font-size:40px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:42px;
 font-weight:bold;
 color:#00ff88;
-animation:pop 1.6s ease;
+box-shadow:0 0 20px #00ff88;
+animation:intro 1.6s ease;
 }
 
-@keyframes pop{
-0%{transform:scale(0) rotate(0);}
-100%{transform:scale(1) rotate(360);}
+@keyframes intro{
+0%{
+transform:scale(0) rotate(0);
+opacity:0;
+}
+100%{
+transform:scale(1) rotate(360deg);
+opacity:1;
+}
 }
 
 /* APP */
+
 .app{
 display:flex;
 flex-direction:column;
@@ -56,12 +80,13 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 background:rgba(0,0,0,0.5);
+backdrop-filter:blur(10px);
 }
 
 .title{
-color:#00ff88;
-font-weight:bold;
 font-size:22px;
+font-weight:bold;
+color:#00ff88;
 }
 
 .search{
@@ -71,13 +96,36 @@ border-radius:10px;
 background:#111;
 color:white;
 width:200px;
+outline:none;
 }
+
+.headerRight{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+background:#00ff88;
+color:black;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+/* SONGS */
 
 .list{
 flex:1;
 overflow:auto;
 padding:10px;
-padding-bottom:200px;
+padding-bottom:120px;
 }
 
 .song{
@@ -88,6 +136,7 @@ border-radius:12px;
 display:flex;
 justify-content:space-between;
 align-items:center;
+gap:10px;
 }
 
 .songLeft{
@@ -97,34 +146,35 @@ align-items:center;
 }
 
 .song img{
-width:50px;
-height:50px;
+width:55px;
+height:55px;
 border-radius:10px;
 }
 
 .songTitle{
 font-weight:bold;
+font-size:15px;
 }
 
 .songArtist{
 font-size:12px;
 opacity:0.7;
+margin-top:2px;
 }
 
 .like{
 color:#ff4d6d;
 font-weight:bold;
+margin-top:5px;
 }
 
-button{
-padding:6px 10px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-background:#00ff88;
-color:black;
-margin-left:5px;
+.songButtons{
+display:flex;
+gap:6px;
+flex-wrap:wrap;
 }
+
+/* PLAYER */
 
 .player{
 position:fixed;
@@ -132,36 +182,150 @@ bottom:0;
 left:0;
 right:0;
 background:#000;
-padding:10px;
+padding:15px;
+border-top:1px solid #222;
+z-index:100;
 }
+
+.nowPlayingTitle{
+font-weight:bold;
+font-size:16px;
+}
+
+.nowPlayingArtist{
+font-size:12px;
+opacity:0.7;
+}
+
+/* VISITORS */
+
+#visitorCounter{
+position:fixed;
+left:10px;
+bottom:85px;
+background:#111;
+padding:8px 12px;
+border-radius:10px;
+font-size:14px;
+z-index:999;
+box-shadow:0 0 10px rgba(0,255,136,0.3);
+}
+
+/* MODAL */
+
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.8);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.modalBox{
+background:#111;
+padding:20px;
+border-radius:12px;
+width:90%;
+max-width:500px;
+}
+
+.modalBox h2{
+margin-bottom:10px;
+}
+
+.modalBox input{
+width:100%;
+padding:10px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#222;
+color:white;
+}
+
+.comment{
+background:#222;
+padding:8px;
+border-radius:8px;
+margin-top:6px;
+}
+
+.modalButtons{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
 </style>
 </head>
 
 <body>
 
 <!-- INTRO -->
+
 <div class="screen" id="intro">
 <div class="logo">PHB</div>
 </div>
 
 <!-- APP -->
+
 <div class="app hidden" id="app">
 
 <div class="header">
-<div class="title">PHONK HUB</div>
-<input class="search" id="search" oninput="render()" placeholder="search">
-<button onclick="openAdd()">+ Add</button>
+
+<div class="title">
+PHONK HUB
+</div>
+
+<div class="headerRight">
+
+<input
+class="search"
+id="search"
+placeholder="Search..."
+oninput="render()">
+
+<button onclick="openAdd()">
++ Add
+</button>
+
+</div>
+
 </div>
 
 <div class="list" id="list"></div>
 
-<div class="player" id="nowPlaying">No song</div>
+<!-- VISITOR COUNTER -->
+
+<div id="visitorCounter">
+👥 Loading...
+</div>
+
+<!-- PLAYER -->
+
+<div class="player">
+
+<div class="nowPlayingTitle" id="pTitle">
+No song selected
+</div>
+
+<div class="nowPlayingArtist" id="pArtist">
+-
+</div>
+
+</div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+/* FIREBASE */
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
 import {
 getFirestore,
 collection,
@@ -171,164 +335,389 @@ doc,
 updateDoc,
 deleteDoc,
 increment,
-arrayUnion
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+arrayUnion,
+getDoc,
+setDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* FIREBASE */
+/* CONFIG */
+
 const firebaseConfig = {
+
 apiKey: "YOUR_API_KEY",
+
 authDomain: "phonk-hub.firebaseapp.com",
+
 projectId: "phonk-hub",
+
 storageBucket: "phonk-hub.firebasestorage.app",
+
 messagingSenderId: "832888450027",
+
 appId: "YOUR_APP_ID"
+
 };
 
+/* INIT */
+
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
+
 const songsRef = collection(db,"songs");
+
+const statsRef = doc(db,"stats","visits");
+
+/* SONGS */
 
 window.songs = [];
 
-/* LIVE SYNC */
+/* LIVE SONGS */
+
 onSnapshot(songsRef,(snap)=>{
-window.songs = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+window.songs = snap.docs.map(doc=>({
+id:doc.id,
+...doc.data()
+}));
+
 render();
+
 });
 
+/* LIVE VISITOR COUNTER */
+
+onSnapshot(statsRef,(snap)=>{
+
+if(snap.exists()){
+
+document.getElementById("visitorCounter")
+.innerText =
+"👥 " +
+snap.data().count +
+" visitors";
+
+}
+
+});
+
+/* UPDATE VISITORS */
+
+async function updateVisitors(){
+
+try{
+
+const snap =
+await getDoc(statsRef);
+
+if(!snap.exists()){
+
+await setDoc(statsRef,{
+count:1
+});
+
+return;
+
+}
+
+await updateDoc(statsRef,{
+count: increment(1)
+});
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+updateVisitors();
+
 /* RENDER */
-window.render = () => {
-const q = document.getElementById("search").value?.toLowerCase() || "";
-const list = document.getElementById("list");
+
+window.render = ()=>{
+
+const q =
+document.getElementById("search")
+.value
+.toLowerCase();
+
+const list =
+document.getElementById("list");
 
 list.innerHTML = "";
 
 window.songs
-.filter(s=>s.title.toLowerCase().includes(q))
-.forEach(s=>{
+
+.filter(song=>
+(song.title || "")
+.toLowerCase()
+.includes(q)
+)
+
+.forEach(song=>{
 
 list.innerHTML += `
+
 <div class="song">
 
 <div class="songLeft">
-<img src="https://picsum.photos/100?random=${s.id}">
+
+<img src="https://picsum.photos/100?random=${song.id}">
+
 <div>
-<div class="songTitle">${s.title}</div>
-<div class="songArtist">${s.artist}</div>
-<div class="like">❤️ ${s.likes||0}</div>
+
+<div class="songTitle">
+${song.title}
+</div>
+
+<div class="songArtist">
+${song.artist}
+</div>
+
+<div class="like">
+❤️ ${song.likes || 0}
+</div>
+
 </div>
 </div>
 
-<div>
-<button onclick="play('${s.title}','${s.link}')">Play</button>
-<button onclick="like('${s.id}')">Like</button>
-<button onclick="openComments('${s.id}')">Comments</button>
-<button onclick="del('${s.id}')">Delete</button>
+<div class="songButtons">
+
+<button onclick="playSong('${song.title}','${song.artist}','${song.link}')">
+Play
+</button>
+
+<button onclick="likeSong('${song.id}')">
+Like
+</button>
+
+<button onclick="openComments('${song.id}')">
+Comments
+</button>
+
+<button onclick="deleteSong('${song.id}')">
+Delete
+</button>
+
 </div>
 
 </div>
+
 `;
+
 });
+
 };
 
-/* PLAY FIX */
-window.play = (title, link) => {
-document.getElementById("nowPlaying").innerText = "Now Playing: " + title;
+/* PLAY */
 
-if(link){
+window.playSong = (
+title,
+artist,
+link
+)=>{
+
+document.getElementById("pTitle")
+.innerText = title;
+
+document.getElementById("pArtist")
+.innerText = artist;
+
 window.open(link,"_blank");
-}
+
 };
 
 /* LIKE */
-window.like = async (id)=>{
-await updateDoc(doc(db,"songs",id),{
+
+window.likeSong = async(id)=>{
+
+await updateDoc(
+doc(db,"songs",id),
+{
 likes: increment(1)
-});
+}
+);
+
 };
 
 /* COMMENTS */
+
 window.openComments = (id)=>{
 
-const s = window.songs.find(x=>x.id===id);
+const song =
+window.songs.find(
+s=>s.id===id
+);
 
-const m = document.createElement("div");
-m.className="screen";
+const modal =
+document.createElement("div");
 
-m.innerHTML=`
-<div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
+modal.className = "modal";
 
-<h3>${s.title}</h3>
+modal.innerHTML = `
+
+<div class="modalBox">
+
+<h2>${song.title}</h2>
 
 <div>
-${(s.comments||[]).map(c=>`<div>${c}</div>`).join("")}
+
+${(song.comments || [])
+
+.map(c=>`
+
+<div class="comment">
+${c}
 </div>
 
-<input id="cInput" placeholder="comment">
+`)
 
-<button onclick="addC('${id}')">Add</button>
-<button onclick="this.parentElement.parentElement.remove()">Close</button>
+.join("")}
 
 </div>
+
+<input
+id="commentInput"
+placeholder="Write comment...">
+
+<div class="modalButtons">
+
+<button onclick="addComment('${id}')">
+Add
+</button>
+
+<button onclick="closeModal()">
+Close
+</button>
+
+</div>
+
+</div>
+
 `;
 
-document.body.appendChild(m);
+document.body.appendChild(modal);
+
 };
 
 /* ADD COMMENT */
-window.addC = async (id)=>{
-const v = document.getElementById("cInput").value;
-if(!v) return;
 
-await updateDoc(doc(db,"songs",id),{
-comments: arrayUnion(v)
-});
+window.addComment = async(id)=>{
+
+const text =
+document
+.getElementById("commentInput")
+.value;
+
+if(!text) return;
+
+await updateDoc(
+doc(db,"songs",id),
+{
+comments: arrayUnion(text)
+}
+);
+
+closeModal();
+
 };
 
 /* DELETE */
-window.del = async (id)=>{
-const pass = prompt("Password?");
-if(pass !== "aletorma") return;
 
-await deleteDoc(doc(db,"songs",id));
+window.deleteSong = async(id)=>{
+
+const pass =
+prompt("Password?");
+
+if(pass !== "aletorma")
+return;
+
+await deleteDoc(
+doc(db,"songs",id)
+);
+
 };
 
 /* ADD SONG */
+
 window.openAdd = ()=>{
 
-const m = document.createElement("div");
-m.className="screen";
+const modal =
+document.createElement("div");
 
-m.innerHTML=`
-<div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
+modal.className = "modal";
+
+modal.innerHTML = `
+
+<div class="modalBox">
 
 <h2>Add Song</h2>
 
-<input id="t" placeholder="Title">
-<input id="a" placeholder="Artist">
-<input id="l" placeholder="Link">
-<input id="p" type="password" placeholder="Password">
+<input
+id="t"
+placeholder="Song title">
 
-<button onclick="submitSong()">Add</button>
-<button onclick="this.parentElement.parentElement.remove()">Close</button>
+<input
+id="a"
+placeholder="Artist">
+
+<input
+id="l"
+placeholder="YouTube link">
+
+<input
+id="p"
+type="password"
+placeholder="Password">
+
+<div class="modalButtons">
+
+<button onclick="submitSong()">
+Add
+</button>
+
+<button onclick="closeModal()">
+Close
+</button>
 
 </div>
+
+</div>
+
 `;
 
-document.body.appendChild(m);
+document.body.appendChild(modal);
+
 };
 
-/* SUBMIT SONG */
-window.submitSong = async ()=>{
+/* SUBMIT */
 
-const pass = document.getElementById("p").value;
-if(pass !== "kingphonk") return;
+window.submitSong = async()=>{
 
-const title = document.getElementById("t").value;
-const artist = document.getElementById("a").value;
-const link = document.getElementById("l").value;
+const pass =
+document.getElementById("p")
+.value;
 
-if(!title || !artist || !link) return;
+if(pass !== "kingphonk")
+return;
+
+const title =
+document.getElementById("t")
+.value;
+
+const artist =
+document.getElementById("a")
+.value;
+
+const link =
+document.getElementById("l")
+.value;
+
+if(!title || !artist || !link)
+return;
 
 await addDoc(songsRef,{
 title,
@@ -338,15 +727,36 @@ likes:0,
 comments:[]
 });
 
-document.querySelectorAll(".screen").forEach(e=>e.remove());
+closeModal();
+
+};
+
+/* CLOSE */
+
+window.closeModal = ()=>{
+
+document
+.querySelectorAll(".modal")
+.forEach(m=>m.remove());
+
 };
 
 /* INTRO */
+
 setTimeout(()=>{
-document.getElementById("intro").classList.add("hidden");
+
+document
+.getElementById("intro")
+.classList.add("hidden");
+
 setTimeout(()=>{
-document.getElementById("app").classList.remove("hidden");
+
+document
+.getElementById("app")
+.classList.remove("hidden");
+
 },1200);
+
 },1500);
 
 </script>
