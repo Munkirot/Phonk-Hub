@@ -297,7 +297,7 @@ oninput="render()">
 
 <div class="list" id="list"></div>
 
-<!-- VISITOR COUNTER -->
+<!-- VISITORS -->
 
 <div id="visitorCounter">
 👥 Loading...
@@ -386,7 +386,7 @@ render();
 
 });
 
-/* LIVE VISITOR COUNTER */
+/* VISITOR COUNTER */
 
 onSnapshot(statsRef,(snap)=>{
 
@@ -401,8 +401,6 @@ snap.data().count +
 }
 
 });
-
-/* UPDATE VISITORS */
 
 async function updateVisitors(){
 
@@ -530,9 +528,35 @@ window.open(link,"_blank");
 
 };
 
-/* LIKE */
+/* LIKE LIMIT */
 
 window.likeSong = async(id)=>{
+
+let likedSongs =
+JSON.parse(
+localStorage.getItem("likedSongs")
+) || {};
+
+if(!likedSongs[id]){
+
+likedSongs[id] = 0;
+
+}
+
+if(likedSongs[id] >= 7){
+
+alert("Max 7 likes reached");
+
+return;
+
+}
+
+likedSongs[id]++;
+
+localStorage.setItem(
+"likedSongs",
+JSON.stringify(likedSongs)
+);
 
 await updateDoc(
 doc(db,"songs",id),
