@@ -103,6 +103,7 @@ outline:none;
 display:flex;
 gap:10px;
 align-items:center;
+flex-wrap:wrap;
 }
 
 button{
@@ -113,10 +114,12 @@ background:#00ff88;
 color:black;
 cursor:pointer;
 font-weight:bold;
+transition:0.2s;
 }
 
 button:hover{
 opacity:0.9;
+transform:scale(1.03);
 }
 
 /* SONGS */
@@ -137,6 +140,13 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 gap:10px;
+border:1px solid rgba(255,255,255,0.04);
+transition:0.2s;
+}
+
+.song:hover{
+transform:translateY(-2px);
+box-shadow:0 0 20px rgba(0,255,136,0.08);
 }
 
 .songLeft{
@@ -235,18 +245,17 @@ display:flex;
 justify-content:center;
 align-items:center;
 z-index:9999;
+backdrop-filter:blur(4px);
 }
 
 .modalBox{
 background:#111;
 padding:20px;
-border-radius:12px;
+border-radius:16px;
 width:90%;
 max-width:500px;
-}
-
-.modalBox h2{
-margin-bottom:10px;
+border:1px solid rgba(255,255,255,0.05);
+box-shadow:0 0 30px rgba(0,0,0,0.5);
 }
 
 .modalBox input,
@@ -255,22 +264,93 @@ width:100%;
 padding:10px;
 margin-top:10px;
 border:none;
-border-radius:8px;
-background:#222;
+border-radius:10px;
+background:#1b1b1b;
 color:white;
 }
 
-.comment{
-background:#222;
-padding:8px;
-border-radius:8px;
-margin-top:6px;
+/* COMMENTS */
+
+.commentsContainer{
+margin-top:15px;
+max-height:300px;
+overflow:auto;
+padding-right:5px;
 }
 
-.modalButtons{
+.commentCard{
+padding:12px;
+border-radius:12px;
+margin-bottom:10px;
+animation:fadeIn 0.2s ease;
+}
+
+.commentTop{
 display:flex;
+align-items:center;
+gap:8px;
+margin-bottom:6px;
+}
+
+.commentAvatar{
+width:30px;
+height:30px;
+border-radius:50%;
+display:flex;
+justify-content:center;
+align-items:center;
+font-weight:bold;
+color:black;
+font-size:14px;
+}
+
+.commentName{
+font-size:13px;
+font-weight:bold;
+}
+
+.commentText{
+font-size:14px;
+line-height:1.4;
+word-break:break-word;
+}
+
+.commentInputWrap{
+margin-top:15px;
+background:#1a1a1a;
+padding:12px;
+border-radius:12px;
+}
+
+.commentInputModern{
+width:100%;
+min-height:90px;
+resize:none;
+padding:12px;
+border:none;
+outline:none;
+border-radius:10px;
+background:#111;
+color:white;
+font-size:14px;
+}
+
+.commentButtons{
+display:flex;
+justify-content:flex-end;
 gap:10px;
 margin-top:10px;
+}
+
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(10px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
 }
 
 </style>
@@ -278,13 +358,9 @@ margin-top:10px;
 
 <body>
 
-<!-- INTRO -->
-
 <div class="screen" id="intro">
 <div class="logo">PHB</div>
 </div>
-
-<!-- APP -->
 
 <div class="app hidden" id="app">
 
@@ -295,6 +371,10 @@ PHONK HUB
 </div>
 
 <div class="headerRight">
+
+<button onclick="toggleLogin()" id="loginBtn">
+Login
+</button>
 
 <input
 class="search"
@@ -318,13 +398,9 @@ The Most Popular
 
 <div class="list" id="list"></div>
 
-<!-- VISITOR COUNTER -->
-
 <div id="visitorCounter">
 👥 Loading...
 </div>
-
-<!-- PLAYER -->
 
 <div class="player">
 
@@ -341,8 +417,6 @@ No song selected
 </div>
 
 <script type="module">
-
-/* FIREBASE */
 
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -362,25 +436,16 @@ setDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-/* CONFIG */
-
 const firebaseConfig = {
 
 apiKey: "YOUR_API_KEY",
-
 authDomain: "phonk-hub.firebaseapp.com",
-
 projectId: "phonk-hub",
-
 storageBucket: "phonk-hub.firebasestorage.app",
-
 messagingSenderId: "832888450027",
-
 appId: "YOUR_APP_ID"
 
 };
-
-/* INIT */
 
 const app = initializeApp(firebaseConfig);
 
@@ -390,13 +455,50 @@ const songsRef = collection(db,"songs");
 
 const statsRef = doc(db,"stats","visits");
 
-/* SONGS */
-
 window.songs = [];
 
 let popularMode = false;
 
-/* LIVE SONGS */
+window.currentUser =
+localStorage.getItem("phonkUser") || null;
+
+window.userColor =
+localStorage.getItem("phonkUserColor") || null;
+
+const userColors = [
+"#ff2b55",
+"#00ff88",
+"#00bfff",
+"#ff9900",
+"#a855f7",
+"#ff4444",
+"#14b8a6",
+"#eab308",
+"#ec4899",
+"#3b82f6"
+];
+
+window.updateLoginButton = ()=>{
+
+const btn =
+document.getElementById("loginBtn");
+
+if(window.currentUser){
+
+btn.innerHTML =
+"Logout (" +
+window.currentUser +
+")";
+
+}else{
+
+btn.innerHTML = "Login";
+
+}
+
+};
+
+updateLoginButton();
 
 onSnapshot(songsRef,(snap)=>{
 
@@ -408,8 +510,6 @@ id:doc.id,
 render();
 
 });
-
-/* VISITOR COUNTER */
 
 onSnapshot(statsRef,(snap)=>{
 
@@ -456,7 +556,100 @@ console.log(err);
 
 updateVisitors();
 
-/* POPULAR TOGGLE */
+/* LOGIN */
+
+window.toggleLogin = ()=>{
+
+if(window.currentUser){
+
+localStorage.removeItem("phonkUser");
+localStorage.removeItem("phonkUserColor");
+
+window.currentUser = null;
+window.userColor = null;
+
+updateLoginButton();
+
+render();
+
+return;
+
+}
+
+const modal =
+document.createElement("div");
+
+modal.className = "modal";
+
+modal.innerHTML = `
+
+<div class="modalBox">
+
+<h2>Login</h2>
+
+<input
+id="loginName"
+placeholder="Username">
+
+<div class="commentButtons">
+
+<button onclick="closeModal()">
+Close
+</button>
+
+<button onclick="loginUser()">
+Login
+</button>
+
+</div>
+
+</div>
+
+`;
+
+document.body.appendChild(modal);
+
+};
+
+window.loginUser = ()=>{
+
+const name =
+document
+.getElementById("loginName")
+.value
+.trim();
+
+if(!name) return;
+
+const randomColor =
+userColors[
+Math.floor(
+Math.random() * userColors.length
+)
+];
+
+window.currentUser = name;
+window.userColor = randomColor;
+
+localStorage.setItem(
+"phonkUser",
+name
+);
+
+localStorage.setItem(
+"phonkUserColor",
+randomColor
+);
+
+updateLoginButton();
+
+closeModal();
+
+render();
+
+};
+
+/* POPULAR */
 
 window.togglePopular = ()=>{
 
@@ -545,9 +738,29 @@ Play
 Like
 </button>
 
+<div style="position:relative;">
+
+<div style="
+position:absolute;
+top:-8px;
+right:-8px;
+background:#ff2b55;
+color:white;
+font-size:11px;
+padding:2px 6px;
+border-radius:20px;
+font-weight:bold;
+">
+
+${(song.comments || []).length}
+
+</div>
+
 <button onclick="openComments('${song.id}')">
 Comments
 </button>
+
+</div>
 
 <button onclick="deleteSong('${song.id}')">
 Delete
@@ -589,7 +802,7 @@ window.open(link,"_blank");
 
 };
 
-/* LIKE LIMIT */
+/* LIKE */
 
 window.likeSong = async(id)=>{
 
@@ -646,16 +859,64 @@ modal.innerHTML = `
 
 <div class="modalBox">
 
-<h2>${song.title}</h2>
+<h2 style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+">
 
-<div>
+<span>${song.title}</span>
+
+<span style="
+font-size:13px;
+background:#ff2b55;
+padding:5px 10px;
+border-radius:20px;
+">
+${(song.comments || []).length} comments
+</span>
+
+</h2>
+
+<div class="commentsContainer">
 
 ${(song.comments || [])
 
-.map(c=>`
+.map((c,index)=>`
 
-<div class="comment">
-${c}
+<div class="commentCard"
+style="
+background:${c.color || '#1b1b1b'}22;
+border:1px solid ${c.color || '#333'};
+box-shadow:0 0 15px ${c.color || '#000'}33;
+">
+
+<div class="commentTop">
+
+<div class="commentAvatar"
+style="
+background:${c.color || '#00ff88'};
+">
+
+${index + 1}
+
+</div>
+
+<div class="commentName"
+style="
+color:${c.color || '#00ff88'};
+">
+
+${c.user || "Anonymous"}
+
+</div>
+
+</div>
+
+<div class="commentText">
+${c.text || c}
+</div>
+
 </div>
 
 `)
@@ -664,19 +925,24 @@ ${c}
 
 </div>
 
+<div class="commentInputWrap">
+
 <textarea
 id="commentInput"
-placeholder="Write comment..."></textarea>
+class="commentInputModern"
+placeholder="Write something..."></textarea>
 
-<div class="modalButtons">
-
-<button onclick="addComment('${id}')">
-Add
-</button>
+<div class="commentButtons">
 
 <button onclick="closeModal()">
 Close
 </button>
+
+<button onclick="addComment('${id}')">
+Add Comment
+</button>
+
+</div>
 
 </div>
 
@@ -692,6 +958,14 @@ document.body.appendChild(modal);
 
 window.addComment = async(id)=>{
 
+if(!window.currentUser){
+
+alert("Login first");
+
+return;
+
+}
+
 const text =
 document
 .getElementById("commentInput")
@@ -702,7 +976,11 @@ if(!text) return;
 await updateDoc(
 doc(db,"songs",id),
 {
-comments: arrayUnion(text)
+comments: arrayUnion({
+user: window.currentUser,
+text:text,
+color: window.userColor
+})
 }
 );
 
@@ -758,14 +1036,14 @@ id="p"
 type="password"
 placeholder="Password">
 
-<div class="modalButtons">
-
-<button onclick="submitSong()">
-Add
-</button>
+<div class="commentButtons">
 
 <button onclick="closeModal()">
 Close
+</button>
+
+<button onclick="submitSong()">
+Add
 </button>
 
 </div>
@@ -777,8 +1055,6 @@ Close
 document.body.appendChild(modal);
 
 };
-
-/* SUBMIT */
 
 window.submitSong = async()=>{
 
@@ -816,8 +1092,6 @@ comments:[]
 closeModal();
 
 };
-
-/* CLOSE */
 
 window.closeModal = ()=>{
 
