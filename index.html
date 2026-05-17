@@ -143,12 +143,19 @@ gap:10px;
 display:flex;
 gap:10px;
 align-items:center;
+flex:1;
 }
 
 .song img{
 width:55px;
 height:55px;
 border-radius:10px;
+}
+
+.songInfo{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
 }
 
 .songTitle{
@@ -166,6 +173,13 @@ margin-top:2px;
 color:#ff4d6d;
 font-weight:bold;
 margin-top:5px;
+font-size:12px;
+}
+
+.plays{
+font-size:12px;
+opacity:0.7;
+margin-top:3px;
 }
 
 .songButtons{
@@ -235,7 +249,8 @@ max-width:500px;
 margin-bottom:10px;
 }
 
-.modalBox input{
+.modalBox input,
+.modalBox textarea{
 width:100%;
 padding:10px;
 margin-top:10px;
@@ -286,6 +301,12 @@ class="search"
 id="search"
 placeholder="Search..."
 oninput="render()">
+
+<button
+onclick="togglePopular()"
+id="popularBtn">
+The Most Popular
+</button>
 
 <button onclick="openAdd()">
 + Add
@@ -373,6 +394,8 @@ const statsRef = doc(db,"stats","visits");
 
 window.songs = [];
 
+let popularMode = false;
+
 /* LIVE SONGS */
 
 onSnapshot(songsRef,(snap)=>{
@@ -433,6 +456,22 @@ console.log(err);
 
 updateVisitors();
 
+/* POPULAR TOGGLE */
+
+window.togglePopular = ()=>{
+
+popularMode = !popularMode;
+
+document.getElementById("popularBtn")
+.innerText =
+popularMode
+? "Normal"
+: "The Most Popular";
+
+render();
+
+};
+
 /* RENDER */
 
 window.render = ()=>{
@@ -447,15 +486,24 @@ document.getElementById("list");
 
 list.innerHTML = "";
 
-window.songs
+let filteredSongs = window.songs
 
 .filter(song=>
 (song.title || "")
 .toLowerCase()
 .includes(q)
-)
+);
 
-.forEach(song=>{
+if(popularMode){
+
+filteredSongs.sort(
+(a,b)=>
+(b.plays || 0) - (a.plays || 0)
+);
+
+}
+
+filteredSongs.forEach(song=>{
 
 list.innerHTML += `
 
@@ -465,7 +513,7 @@ list.innerHTML += `
 
 <img src="https://picsum.photos/100?random=${song.id}">
 
-<div>
+<div class="songInfo">
 
 <div class="songTitle">
 ${song.title}
@@ -479,12 +527,17 @@ ${song.artist}
 ❤️ ${song.likes || 0}
 </div>
 
+<div class="plays">
+▶ ${song.plays || 0} plays
 </div>
+
+</div>
+
 </div>
 
 <div class="songButtons">
 
-<button onclick="playSong('${song.title}','${song.artist}','${song.link}')">
+<button onclick="playSong('${song.title}','${song.artist}','${song.link}','${song.id}')">
 Play
 </button>
 
@@ -512,10 +565,11 @@ Delete
 
 /* PLAY */
 
-window.playSong = (
+window.playSong = async (
 title,
 artist,
-link
+link,
+id
 )=>{
 
 document.getElementById("pTitle")
@@ -523,6 +577,13 @@ document.getElementById("pTitle")
 
 document.getElementById("pArtist")
 .innerText = artist;
+
+await updateDoc(
+doc(db,"songs",id),
+{
+plays: increment(1)
+}
+);
 
 window.open(link,"_blank");
 
@@ -603,9 +664,9 @@ ${c}
 
 </div>
 
-<input
+<textarea
 id="commentInput"
-placeholder="Write comment...">
+placeholder="Write comment..."></textarea>
 
 <div class="modalButtons">
 
@@ -748,6 +809,7 @@ title,
 artist,
 link,
 likes:0,
+plays:0,
 comments:[]
 });
 
